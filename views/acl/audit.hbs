@@ -1,0 +1,34 @@
+<style>
+    tbody tr:nth-child(odd) {
+        background-color: #cccc;
+    }
+</style>
+<h1>Audit logs for ACL {{acl.id}}</h1>
+<table>
+    <thead>
+    <tr>
+        <th>Action</th>
+        <th>Method</th>
+        <th>Endpoint</th>
+        <th>Scope</th>
+        <th>Query params</th>
+        <th>Record</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{#each auditLogs}}
+        <tr>
+            <td>{{this.createdAt}}</td>
+            <td>{{this.method}}</td>
+            <td>{{this.xrpcCall}}</td>
+            <td>{{this.matchedScope}}</td>
+            <td><code>{{json this.qp}}</code></td>
+            <td>
+                {{#each this.records}}
+                    <pre>{{jsonF this}}</pre>
+                {{/each}}
+            </td>
+        </tr>
+    {{/each}}
+    </tbody>
+</table>

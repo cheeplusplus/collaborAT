@@ -1,0 +1,35 @@
+import * as fs from "fs";
+import { Jwk } from "@atproto/oauth-client-node";
+
+interface Config {
+  baseUrl: string;
+  domain: string;
+  oauth: {
+    isLocalhostDev?: boolean;
+    clientName: string;
+    keyset: Record<string, Jwk>;
+  };
+  express: {
+    sessionSecret: string;
+    sessionExpirySec?: number;
+  };
+  jwtSecretKey: string;
+  dbEncryptionKey: string;
+}
+
+let savedConfig: Config | undefined;
+
+export function getConfig(): Config {
+  if (savedConfig) {
+    return savedConfig;
+  }
+
+  const loadedConfig = fs.readFileSync("./sharesky.config.json", "utf8");
+  savedConfig = JSON.parse(loadedConfig) as Config;
+  return savedConfig;
+}
+
+export function getDbEncryptionKey() {
+  const { dbEncryptionKey } = getConfig();
+  return Buffer.from(dbEncryptionKey, "base64");
+}

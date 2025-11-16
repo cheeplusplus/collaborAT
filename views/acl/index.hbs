@@ -1,0 +1,23 @@
+<h1>ACL</h1>
+<h2>Created by you</h2>
+{{#each grantedByMe}}
+    <div>
+        <p><a href="/acl/{{this.id}}">ACL {{this.id}}</a></p>
+        <pre>{{jsonF this}}</pre>
+    </div>
+{{/each}}
+<h2>Granted to you</h2>
+{{#each grantedToMe}}
+    <div>
+        <p><a href="/acl/{{this.id}}">ACL {{this.id}}</a></p>
+        <pre>{{jsonF this}}</pre>
+    </div>
+{{/each}}
+<hr>
+<div>
+    <h3>Create new ACL</h3>
+    <form method="post">
+        Actor DID: <input type="text" name="actorDid"><br>
+        <input type="submit">
+    </form>
+</div>

@@ -1,0 +1,76 @@
+<h1>ACL {{acl.id}}</h1>
+<pre>{{{jsonF acl}}}</pre>
+
+<a href="/acl/{{acl.id}}/audit">View audit logs</a>
+
+{{#if mine}}
+    <h2>Edit</h2>
+    <form method="post">
+        <h3>Scopes</h3>
+        <h4>Categories</h4>
+        <div>
+            {{#each endpointCategories}}
+                <div>
+                    <label>
+                        <input type="checkbox" name="endpointCategories[]" value="{{this.value}}"
+                               {{#if this.active}}checked{{/if}}>
+                        {{this.label}}
+                    </label>
+                </div>
+            {{/each}}
+        </div>
+        <h4>Repository types</h4>
+        <div>Note: You must check "manage repository records" above</div>
+        {{#each recordCategories}}
+            <div>
+                <label>
+                    <input type="checkbox" name="recordCategories[]" value="{{this.value}}"
+                           {{#if this.active}}checked{{/if}}>
+                    {{this.label}}
+                </label>
+            </div>
+        {{/each}}
+        <input type="submit">
+    </form>
+
+    <h2>Revoke</h2>
+    <form method="POST" action="/acl/{{acl.id}}/revoke">
+        <input type="submit" value="Revoke">
+    </form>
+{{else}}
+    <h2>Scopes</h2>
+    <h3>Categories</h3>
+    <div>
+        {{#each endpointCategories}}
+            {{#if this.active}}
+                <p title="{{this.value}}">{{this.label}}</p>
+            {{/if}}
+        {{/each}}
+    </div>
+    <h3>Repository types</h3>
+    {{#each recordCategories}}
+        {{#if this.active}}
+            <p title="{{this.value}}">{{this.label}}</p>
+        {{/if}}
+    {{/each}}
+
+    <h2>Login details</h2>
+    {{#if acl.revokedAt}}
+        <strong>This ACL has been revoked.</strong>
+    {{else}}
+        {{#if acl.hasPassword}}
+            <p>Username: {{acl.username}}</p>
+            <p>Password has already been generated.</p>
+        {{else}}
+            <h2>Unseal</h2>
+            <form method="post" action="/acl/{{acl.id}}/unseal">
+                <input type="submit">
+            </form>
+        {{/if}}
+    {{/if}}
+
+    <h3>Invalidate sessions</h3>
+    <form method="POST" action="/acl/{{acl.id}}/invalidate-sessions">
+        <input type="submit" value="Invalidate sessions">
+    </form>
+{{/if}}

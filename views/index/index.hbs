@@ -1,0 +1,15 @@
+Hello world!
+
+{{#if loggedInDid}}
+    You are: @{{loggedInHandle}} (<code>{{loggedInDid}}</code>)
+    <p>
+        <a href="/acl">Manage access</a>
+    </p>
+    <p>
+        <a href="/logout">Log out</a>
+    </p>
+{{else}}
+    <p>
+        <a href="/login">Log in</a>
+    </p>
+{{/if}}

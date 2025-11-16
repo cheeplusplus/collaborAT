@@ -62,7 +62,7 @@ export async function revokeAccessTokenById(id: number) {
     })
     .execute();
 }
-export async function revokeAccessTokenByAclId(id: number) {
+export async function revokeAccessTokensByAclId(id: number) {
   await db
     .updateTable("proxyTokens")
     .where("aclId", "=", id)

@@ -64,10 +64,15 @@
         {{#if acl.hasPassword}}
             <p>Username: {{acl.username}}</p>
             <p>Password has already been generated.</p>
+            <h3>Password reset</h3>
+            <form method="post" action="/acl/{{acl.id}}/reset-password">
+                <p>Warning: This will invalidate any logged in sessions.</p>
+                <input type="submit" value="Reset password">
+            </form>
         {{else}}
-            <h2>Unseal</h2>
+            <h3>Unseal</h3>
             <form method="post" action="/acl/{{acl.id}}/unseal">
-                <input type="submit">
+                <input type="submit" value="Get password">
             </form>
         {{/if}}
     {{/if}}

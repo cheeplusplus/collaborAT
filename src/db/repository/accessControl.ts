@@ -5,7 +5,7 @@ const getBasicAclQuery = () =>
   db
     .selectFrom("accessControls")
     .selectAll()
-    .select(({ eb, selectFrom }) => [
+    .select(({ selectFrom }) => [
       selectFrom("proxyTokens")
         .whereRef("accessControls.id", "=", "proxyTokens.aclId")
         .select(({ eb, fn }) => [
@@ -96,4 +96,16 @@ export async function revokeAccessControlById(id: number) {
     .where("id", "=", id)
     .set({ revokedAt: new Date().toISOString() })
     .execute();
+}
+
+export async function resetAccessControlPassword(id: number) {
+  return await db
+    .updateTable("accessControls")
+    .where("id", "=", id)
+    .set({
+      passwordHash: null,
+      updatedAt: new Date().toISOString(),
+    })
+    .returningAll()
+    .executeTakeFirstOrThrow();
 }

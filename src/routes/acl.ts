@@ -6,6 +6,7 @@ import {
   getAccessControlById,
   getAccessControlsByActorDid,
   getAccessControlsByTargetDid,
+  resetAccessControlPassword,
   revokeAccessControlById,
   unsealAccessControl,
   updateAccessControl,
@@ -17,7 +18,7 @@ import {
   hashPassword,
 } from "../util/security";
 import { AccessControl, User } from "../db/model";
-import { revokeAccessTokenByAclId } from "../db/repository/tokens";
+import { revokeAccessTokensByAclId } from "../db/repository/tokens";
 import {
   EndpointCategoryDescriptions,
   isValidScope,
@@ -211,7 +212,7 @@ app.get("/:aclId/audit", requireUser(), async (req, res) => {
     return;
   }
 
-  const auditLogs = await getAuditLogs(acl.id);
+  const auditLogs = await getAuditLogs(acl.id, 50, true);
   return res.render("acl/audit", {
     acl: safeAcl(acl),
     mine: acl.targetDid === req.user.userDid,
@@ -268,7 +269,7 @@ app.post("/:aclId/revoke", requireUser(), async (req, res) => {
     return res.status(400).json({ error: "ACL is already revoked" });
   }
 
-  await revokeAccessTokenByAclId(acl.id);
+  await revokeAccessTokensByAclId(acl.id);
   await revokeAccessControlById(acl.id);
   res.redirect("/acl");
 });
@@ -288,7 +289,25 @@ app.post("/:aclId/invalidate-sessions", requireUser(), async (req, res) => {
       .json({ error: "Target cannot invalidate ACL sessions" });
   }
 
-  await revokeAccessTokenByAclId(acl.id);
+  await revokeAccessTokensByAclId(acl.id);
+  res.redirect(`/acl/${acl.id}`);
+});
+
+app.post("/:aclId/reset-password", requireUser(), async (req, res) => {
+  // Reset password (and invalidate sessions) for ACL
+  assertUser(req.user);
+  const acl = await requireAcl(req, res);
+  if (!acl) {
+    return;
+  }
+
+  // This should be called only by the actorDid user
+  if (acl.actorDid !== req.user.userDid) {
+    return res.status(403).json({ error: "Target cannot reset password" });
+  }
+
+  await resetAccessControlPassword(acl.id);
+  await revokeAccessTokensByAclId(acl.id);
   res.redirect(`/acl/${acl.id}`);
 });
 

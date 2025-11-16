@@ -8,6 +8,7 @@ import { RepoOperationSource } from "../scoping/scopes";
 
 export interface RecordRequestDetails {
   operationSource: RepoOperationSource;
+  operation: "create" | "update" | "delete" | "unknown";
   repo: string;
   collection: string;
   rkey?: string;
@@ -33,6 +34,14 @@ export function extractRecordDetailsFromRequest(
     const reqBody = requestBody as ComAtprotoRepoApplyWrites.InputSchema;
     return reqBody.writes.map((m) => ({
       operationSource: m.$type,
+      operation:
+        m.$type === "com.atproto.repo.applyWrites#create"
+          ? "create"
+          : m.$type === "com.atproto.repo.applyWrites#update"
+            ? "update"
+            : m.$type === "com.atproto.repo.applyWrites#delete"
+              ? "delete"
+              : "unknown",
       repo: reqBody.repo,
       collection: m.collection,
       rkey: m.rkey,
@@ -45,6 +54,7 @@ export function extractRecordDetailsFromRequest(
     return [
       {
         operationSource: xrpcName,
+        operation: "create",
         repo: reqBody.repo,
         collection: reqBody.collection,
         rkey: reqBody.rkey,
@@ -58,6 +68,7 @@ export function extractRecordDetailsFromRequest(
     return [
       {
         operationSource: xrpcName,
+        operation: "delete",
         repo: reqBody.repo,
         collection: reqBody.collection,
         rkey: reqBody.rkey,
@@ -70,6 +81,7 @@ export function extractRecordDetailsFromRequest(
     return [
       {
         operationSource: xrpcName,
+        operation: "update",
         repo: reqBody.repo,
         collection: reqBody.collection,
         rkey: reqBody.rkey,

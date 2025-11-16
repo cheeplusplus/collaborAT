@@ -211,6 +211,9 @@ const xrpcProxy = async (req: express.Request, res: express.Response) => {
         ip: req.ip!,
         userAgent: req.headers["user-agent"],
       },
+      {
+        did: acl.targetDid,
+      },
     );
   }
 

@@ -1,7 +1,5 @@
 import { ColumnType, Generated, JSONColumnType, Selectable } from "kysely";
 import { DidDocument } from "@atproto/identity";
-import { NodeSavedSession as AtprotoSessionData } from "@atproto/oauth-client-node";
-import { NodeSavedState as AtprotoStateData } from "@atproto/oauth-client-node/dist/node-dpop-store";
 import { SessionData as ExpressSessionData } from "express-session";
 import { RecordDetails } from "../util/atprotoTools";
 
@@ -24,6 +22,7 @@ export interface Database {
   accessControls: AccessControlTable;
   proxyTokens: ProxyTokenTable;
   proxyAuditLogs: ProxyAuditLogTable;
+  repoAuditLogs: RepoAuditLogTable;
   expressSession: ExpressSessionTable;
   atprotoStateStore: AtprotoStateStoreTable;
   atprotoSession: AtprotoSessionTable;
@@ -51,7 +50,7 @@ export interface AccessControlTable {
   scopes: JSONColumnType<string[]>; // TODO: can we do this as a native array?
 
   username: string;
-  passwordHash: ColumnType<string | null, never, string>;
+  passwordHash: ColumnType<string | null, never, string | null>;
 
   createdAt: CreatedAtDate;
   updatedAt: UpdatedAtDate;
@@ -89,7 +88,19 @@ export interface ProxyAuditLogTable {
   method: string;
   qp: string | null;
 
-  records: JSONColumnType<RecordDetails[]> | null;
+  createdAt: CreatedAtDate;
+}
+
+export interface RepoAuditLogTable {
+  id: Generated<number>;
+
+  // we want to keep track of more than just proxy actions
+  targetDid: string;
+  actorDid: string;
+  auditLogId: number | null;
+
+  action: string;
+  record: JSONColumnType<RecordDetails>;
 
   createdAt: CreatedAtDate;
 }
@@ -116,6 +127,7 @@ export type User = Selectable<UserTable>;
 export type AccessControl = Selectable<AccessControlTable>;
 export type ProxyToken = Selectable<ProxyTokenTable>;
 export type ProxyAuditLog = Selectable<ProxyAuditLogTable>;
+export type RepoAuditLog = Selectable<RepoAuditLogTable>;
 export type ExpressSession = Selectable<ExpressSessionTable>;
 export type AtprotoStateStore = Selectable<AtprotoStateStoreTable>;
 export type AtprotoSession = Selectable<AtprotoSessionTable>;

@@ -3,21 +3,27 @@
 {{#each grantedByMe}}
     <div>
         <p><a href="/acl/{{this.id}}">ACL {{this.id}}</a></p>
-        <pre>{{jsonF this}}</pre>
+        <pre style="display: none">{{jsonF this}}</pre>
+        <p>Granted by <strong>you</strong> to <strong>{{this.actorHandle}}</strong></p>
     </div>
 {{/each}}
 <h2>Granted to you</h2>
 {{#each grantedToMe}}
     <div>
         <p><a href="/acl/{{this.id}}">ACL {{this.id}}</a></p>
-        <pre>{{jsonF this}}</pre>
+        <pre style="display: none">{{jsonF this}}</pre>
+        <p>Granted by <strong>{{this.targetHandle}}</strong> to <strong>you</strong></p>
     </div>
 {{/each}}
 <hr>
 <div>
     <h3>Create new ACL</h3>
+    <p>This creates a login for the actor to use. Access rights will be granted on the next page.</p>
     <form method="post">
-        Actor DID: <input type="text" name="actorDid"><br>
+        <label>
+            Actor:
+            <input type="text" name="actorDid" placeholder="Handle or DID">
+        </label><br>
         <input type="submit">
     </form>
 </div>

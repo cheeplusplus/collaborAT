@@ -1,5 +1,7 @@
 <h1>ACL {{acl.id}}</h1>
-<pre>{{{jsonF acl}}}</pre>
+<pre style="display: none;">{{{jsonF acl}}}</pre>
+
+<p>Granted to {{actorUser.handle}} by {{targetUser.handle}}</p>
 
 <a href="/acl/{{acl.id}}/audit">View audit logs</a>
 
@@ -7,6 +9,7 @@
     <h2>Edit</h2>
     <form method="post">
         <h3>Scopes</h3>
+        <p>This controls the access this login will grant. Reads are allowed, and writes are forbidden unless something is checked in the list below.</p>
         <h4>Categories</h4>
         <div>
             {{#each endpointCategories}}
@@ -20,7 +23,7 @@
             {{/each}}
         </div>
         <h4>Repository types</h4>
-        <div>Note: You must check "manage repository records" above</div>
+        <p>You must check "manage repository records" above for any of these to apply.</p>
         {{#each recordCategories}}
             <div>
                 <label>
@@ -38,7 +41,7 @@
         <input type="submit" value="Revoke">
     </form>
 {{else}}
-    <h2>Scopes</h2>
+    <h2>Granted scopes</h2>
     <h3>Categories</h3>
     <div>
         {{#each endpointCategories}}

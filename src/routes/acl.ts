@@ -16,7 +16,7 @@ import {
   generateRandomUsername,
   hashPassword,
 } from "../util/security";
-import { AccessControl } from "../db/model";
+import { AccessControl, User } from "../db/model";
 import { revokeAccessTokenByAclId } from "../db/repository/tokens";
 import {
   EndpointCategoryDescriptions,
@@ -62,9 +62,26 @@ app.get("/", requireUser(), async (req, res) => {
   assertUser(req.user);
   const grantedByMe = await getAccessControlsByTargetDid(req.user.userDid);
   const grantedToMe = await getAccessControlsByActorDid(req.user.userDid);
+
+  let uCache: Record<string, User> = {};
+  const transformGrant = async (acl: AccessControl) => {
+    const actorUser = uCache[acl.actorDid] ?? (await getUser(acl.actorDid));
+    uCache[acl.actorDid] = actorUser;
+    const actorHandle = actorUser?.handle ?? "(@unknown)";
+    const targetUser = uCache[acl.targetDid] ?? (await getUser(acl.targetDid));
+    uCache[acl.targetDid] = targetUser;
+    const targetHandle = targetUser?.handle ?? "(@unknown)";
+
+    return {
+      actorHandle,
+      targetHandle,
+      ...safeAcl(acl),
+    };
+  };
+
   return res.render("acl/index", {
-    grantedByMe: grantedByMe.map(safeAcl),
-    grantedToMe: grantedToMe.map(safeAcl),
+    grantedByMe: await Promise.all(grantedByMe.map(transformGrant)),
+    grantedToMe: await Promise.all(grantedToMe.map(transformGrant)),
   });
 });
 
@@ -78,12 +95,16 @@ app.post("/", requireUser(), express.urlencoded(), async (req, res) => {
   assertUser(req.user);
   const body = req.body as CreateAclRequest;
 
-  if (body.actorDid === req.user.userDid) {
-    return res.status(400).json({ error: "Cannot grant access to self" });
+  const resolvedDid = await req.atprotoClient.identityResolver.resolve(
+    body.actorDid,
+  );
+  if (!resolvedDid) {
+    return res.status(400).json({ error: "Failed to resolve actor" });
   }
+  const actorDid = resolvedDid.did;
 
   // Validate that the actor DID is registered
-  const actorUser = await getUser(body.actorDid);
+  const actorUser = await getUser(actorDid);
   if (!actorUser) {
     return res.status(400).json({ error: "Actor DID not registered" });
   }
@@ -94,7 +115,7 @@ app.post("/", requireUser(), express.urlencoded(), async (req, res) => {
   );
   const acl = await createAccessControl(
     req.user.userDid,
-    body.actorDid,
+    actorDid,
     [], // require editing to set scopes
     username,
   );
@@ -108,6 +129,15 @@ app.get("/:aclId", requireUser(), async (req, res) => {
   const acl = await requireAcl(req, res);
   if (!acl) {
     return;
+  }
+
+  const actorUser = await getUser(acl.actorDid);
+  if (!actorUser) {
+    return res.status(404).json({ error: "Actor DID not registered" });
+  }
+  const targetUser = await getUser(acl.targetDid);
+  if (!targetUser) {
+    return res.status(404).json({ error: "Target DID not registered" });
   }
 
   const endpointCategories = _.chain(EndpointCategoryDescriptions)
@@ -130,6 +160,8 @@ app.get("/:aclId", requireUser(), async (req, res) => {
   return res.render("acl/view", {
     acl: safeAcl(acl),
     mine: acl.targetDid === req.user.userDid,
+    targetUser,
+    actorUser,
     endpointCategories,
     recordCategories,
   });

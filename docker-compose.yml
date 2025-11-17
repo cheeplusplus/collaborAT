@@ -1,0 +1,10 @@
+services:
+  server:
+    # image: ghcr.io/cheeplusplus/sharesky/server:latest
+    build: .
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./sharesky.config.json:/usr/src/app/sharesky.config.json:ro
+      - ./data:/usr/src/app/data

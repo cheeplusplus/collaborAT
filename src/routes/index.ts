@@ -12,6 +12,10 @@ import { optionalUser } from "../middleware/auth";
 const app = express();
 app.use(compression());
 
+if (!getConfig().oauth.isLocalhostDev) {
+  app.set("trust proxy", 1);
+}
+
 app.use(
   session({
     secret: getConfig().express.sessionSecret,

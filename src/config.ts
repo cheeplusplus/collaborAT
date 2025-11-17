@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import { Jwk } from "@atproto/oauth-client-node";
 
-interface Config {
+export interface Config {
   baseUrl: string;
   domain: string;
   oauth: {

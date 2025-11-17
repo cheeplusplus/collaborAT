@@ -7,7 +7,7 @@
     "start": "node build/index.js",
     "debug": "node --inspect build/index.js",
     "build": "tsc",
-    "test": "jest",
+    "test": "jest src/",
     "test:debug": "node --inspect node_modules/jest/bin/jest.js --runInBand",
     "generate:keys": "node build/keytool.js"
   },

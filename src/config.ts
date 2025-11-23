@@ -15,6 +15,7 @@ export interface Config {
   };
   jwtSecretKey: string;
   dbEncryptionKey: string;
+  adminDids: string[];
 }
 
 let savedConfig: Config | undefined;
@@ -32,4 +33,8 @@ export function getConfig(): Config {
 export function getDbEncryptionKey() {
   const { dbEncryptionKey } = getConfig();
   return Buffer.from(dbEncryptionKey, "base64");
+}
+
+export function isAdmin(did: string) {
+  return getConfig().adminDids.includes(did);
 }

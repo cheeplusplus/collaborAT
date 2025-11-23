@@ -14,20 +14,25 @@ const getBasicAclQuery = () =>
         .as("hasSession"),
     ]);
 
+type AclRow = Awaited<
+  ReturnType<ReturnType<typeof getBasicAclQuery>["execute"]>
+>[0];
+type CleanedAclRow = Omit<AclRow, "hasSession"> & { hasSession: boolean };
+
+// Convert the SqlBool to a real bool
+const cleanBasicAclQueryRow = (row: AclRow): CleanedAclRow => ({
+  ...row,
+  hasSession: row.hasSession === true || row.hasSession === 1,
+});
+
 export async function getAccessControlsByActorDid(did: string) {
   const rows = await getBasicAclQuery().where("actorDid", "=", did).execute();
-  return rows.map((row) => ({
-    ...row,
-    hasSession: row.hasSession === true || row.hasSession === 1,
-  }));
+  return rows.map(cleanBasicAclQueryRow);
 }
 
 export async function getAccessControlsByTargetDid(did: string) {
   const rows = await getBasicAclQuery().where("targetDid", "=", did).execute();
-  return rows.map((row) => ({
-    ...row,
-    hasSession: row.hasSession === true || row.hasSession === 1,
-  }));
+  return rows.map(cleanBasicAclQueryRow);
 }
 
 export async function getAccessControlById(id: number) {
@@ -35,10 +40,7 @@ export async function getAccessControlById(id: number) {
   if (!row) {
     return undefined;
   }
-  return {
-    ...row,
-    hasSession: row.hasSession === true || row.hasSession === 1,
-  };
+  return cleanBasicAclQueryRow(row);
 }
 
 export async function getAccessControlByLogin(username: string) {
@@ -47,6 +49,18 @@ export async function getAccessControlByLogin(username: string) {
     .selectAll()
     .where("username", "=", username)
     .executeTakeFirst();
+}
+
+export async function getAllAccessControls(limit?: number, offset?: number) {
+  let q = getBasicAclQuery();
+  if (limit) {
+    q = q.limit(limit);
+  }
+  if (offset) {
+    q = q.offset(offset);
+  }
+  const rows = await q.execute();
+  return rows.map(cleanBasicAclQueryRow);
 }
 
 export async function createAccessControl(

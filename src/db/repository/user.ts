@@ -8,6 +8,13 @@ export async function getUser(did: string) {
     .executeTakeFirst();
 }
 
+export async function getAllUsers() {
+  return await db
+    .selectFrom("users")
+    .selectAll()
+    .execute();
+}
+
 async function createUser(
   did: string,
   handle: string,

@@ -1,0 +1,25 @@
+<h1>All ACLs</h1>
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Target</th>
+        <th>Actor</th>
+        <th>Scopes</th>
+        <th>Has password</th>
+        <th>Has session</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{#each acls}}
+        <tr>
+            <td><a href="/acl/{{this.id}}">{{this.id}}</a></td>
+            <td><a href="https://bsky.app/profile/{{this.targetDid}}">{{this.targetHandle}}</a></td>
+            <td><a href="https://bsky.app/profile/{{this.actorDid}}">{{this.actorHandle}}</a></td>
+            <td><code>{{this.scopes}}</code></td>
+            <td>{{this.hasPassword}}</td>
+            <td>{{this.hasSession}}</td>
+        </tr>
+    {{/each}}
+    </tbody>
+</table>

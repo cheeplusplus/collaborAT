@@ -34,6 +34,7 @@ async function main() {
       express: { sessionSecret },
       jwtSecretKey,
       dbEncryptionKey,
+      adminDids: [],
     };
     if (!(await fs.stat("sharesky.config.json").catch(() => false))) {
       await fs.writeFile(

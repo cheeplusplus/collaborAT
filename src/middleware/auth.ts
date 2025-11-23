@@ -1,5 +1,6 @@
 import { RequestHandler } from "express-serve-static-core";
 import { getUser } from "../db/repository/user";
+import { isAdmin } from "../config";
 
 export function requireUser(onFailure?: string | number | undefined) {
   const handler: RequestHandler = async (req, res, next) => {
@@ -7,7 +8,7 @@ export function requireUser(onFailure?: string | number | undefined) {
       if (!onFailure) {
         res.redirect("/login");
       } else if (typeof onFailure === "number") {
-        res.status(onFailure);
+        res.sendStatus(onFailure);
       } else {
         res.redirect(onFailure);
       }
@@ -51,4 +52,14 @@ export function assertUser(
   if (!user || !user.userRecord || !user.userDid) {
     throw new Error("User not found.");
   }
+}
+
+export function requireAdmin() {
+  const handler: RequestHandler = async (req, res, next) => {
+    if (!req.session.loggedInDid || !isAdmin(req.session.loggedInDid)) {
+      return res.sendStatus(403);
+    }
+    next();
+  };
+  return handler;
 }

@@ -40,6 +40,25 @@ export async function getAuditLogs(
   return output;
 }
 
+export async function getRecentAuditLogs(limit: number = 100) {
+  return await db
+    .selectFrom("proxyAuditLogs")
+    .orderBy("createdAt", "desc")
+    .leftJoin("accessControls", "accessControls.id", "proxyAuditLogs.aclId")
+    .limit(limit)
+    .select([
+      "proxyAuditLogs.id",
+      "proxyAuditLogs.xrpcCall",
+      "proxyAuditLogs.matchedScope",
+      "proxyAuditLogs.method",
+      "proxyAuditLogs.qp",
+      "proxyAuditLogs.createdAt as createdAt",
+      "accessControls.targetDid as targetDid",
+      "accessControls.actorDid as actorDid",
+    ])
+    .execute();
+}
+
 export async function createAuditLogEvent(
   aclId: number,
   proxyTokenId: number,

@@ -2,6 +2,7 @@ import { engine } from "express-handlebars";
 import express from "express";
 import authRouter from "./auth";
 import xrpcRouter from "./xrpc";
+import adminRouter from "./admin";
 import aclRouter from "./acl";
 import session from "express-session";
 import { ExpressSessionStore } from "../db/repository/session";
@@ -39,6 +40,7 @@ app.set("views", "./views");
 
 app.use(authRouter);
 app.use("/xrpc", xrpcRouter);
+app.use("/admin", adminRouter);
 app.use("/acl", aclRouter);
 
 app.get("/", optionalUser, async (req, res) => {

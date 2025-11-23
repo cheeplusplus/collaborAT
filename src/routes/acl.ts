@@ -17,7 +17,7 @@ import {
   generateRandomUsername,
   hashPassword,
 } from "../util/security";
-import { AccessControl, User } from "../db/model";
+import { AccessControl } from "../db/model";
 import { revokeAccessTokensByAclId } from "../db/repository/tokens";
 import {
   EndpointCategoryDescriptions,
@@ -25,6 +25,8 @@ import {
   RecordCollectionCategoryDescriptions,
 } from "../scoping/scopes";
 import { getAuditLogs } from "../db/repository/auditLogs";
+import { UserLookupCache } from "../util/userCache";
+import { isAdmin } from "../config";
 
 const app = express.Router();
 
@@ -39,7 +41,11 @@ const safeAcl = (
   hasSession: acl.hasSession,
 });
 
-async function requireAcl(req: express.Request, res: express.Response) {
+async function requireAcl(
+  req: express.Request,
+  res: express.Response,
+  allowAdmin = false,
+) {
   assertUser(req.user);
   const aclId = req.params.aclId;
   if (!aclId) {
@@ -50,6 +56,9 @@ async function requireAcl(req: express.Request, res: express.Response) {
   if (!acl) {
     res.status(404).json({ error: "ACL not found" });
     return undefined;
+  }
+  if (allowAdmin && isAdmin(req.user.userDid)) {
+    return acl;
   }
   if (acl.actorDid !== req.user.userDid && acl.targetDid !== req.user.userDid) {
     res.status(403).json({ error: "ACL is not yours" });
@@ -64,14 +73,11 @@ app.get("/", requireUser(), async (req, res) => {
   const grantedByMe = await getAccessControlsByTargetDid(req.user.userDid);
   const grantedToMe = await getAccessControlsByActorDid(req.user.userDid);
 
-  let uCache: Record<string, User> = {};
+  const uCache = new UserLookupCache();
   const transformGrant = async (acl: AccessControl) => {
-    const actorUser = uCache[acl.actorDid] ?? (await getUser(acl.actorDid));
-    uCache[acl.actorDid] = actorUser;
-    const actorHandle = actorUser?.handle ?? "(@unknown)";
-    const targetUser = uCache[acl.targetDid] ?? (await getUser(acl.targetDid));
-    uCache[acl.targetDid] = targetUser;
-    const targetHandle = targetUser?.handle ?? "(@unknown)";
+    const actorHandle = (await uCache.getHandle(acl.actorDid)) ?? "(@unknown)";
+    const targetHandle =
+      (await uCache.getHandle(acl.targetDid)) ?? "(@unknown)";
 
     return {
       actorHandle,
@@ -127,7 +133,7 @@ app.post("/", requireUser(), express.urlencoded(), async (req, res) => {
 app.get("/:aclId", requireUser(), async (req, res) => {
   // ACL details
   assertUser(req.user);
-  const acl = await requireAcl(req, res);
+  const acl = await requireAcl(req, res, true);
   if (!acl) {
     return;
   }

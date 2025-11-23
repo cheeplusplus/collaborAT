@@ -26,7 +26,7 @@ import {
 } from "../scoping/scopes";
 import { getAuditLogs } from "../db/repository/auditLogs";
 import { UserLookupCache } from "../util/userCache";
-import { isAdmin } from "../config";
+import { getConfig, isAdmin } from "../config";
 
 const app = express.Router();
 
@@ -255,6 +255,7 @@ app.post("/:aclId/unseal", requireUser(), async (req, res) => {
     targetDid: acl.targetDid,
     username: acl.username,
     password,
+    serverHost: getConfig().baseUrl.replace("https://", ""),
   });
 });
 

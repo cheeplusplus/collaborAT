@@ -9,6 +9,7 @@ import { ExpressSessionStore } from "../db/repository/session";
 import { getConfig } from "../config";
 import compression from "compression";
 import { optionalUser } from "../middleware/auth";
+import { userHasWriteAtScopes } from "../db/repository/user";
 
 const app = express();
 app.use(compression());
@@ -47,6 +48,7 @@ app.get("/", optionalUser, async (req, res) => {
   res.render("index/index", {
     loggedInDid: req.session.loggedInDid,
     loggedInHandle: req.user?.userRecord?.handle,
+    atReadOnly: !userHasWriteAtScopes(req.user?.userRecord),
   });
 });
 

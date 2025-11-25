@@ -1,4 +1,5 @@
 import db from "../db";
+import { User } from "../model";
 
 export async function getUser(did: string) {
   return await db
@@ -9,16 +10,14 @@ export async function getUser(did: string) {
 }
 
 export async function getAllUsers() {
-  return await db
-    .selectFrom("users")
-    .selectAll()
-    .execute();
+  return await db.selectFrom("users").selectAll().execute();
 }
 
 async function createUser(
   did: string,
   handle: string,
   didDoc: any,
+  scope: string,
   updates: { ip: string; userAgent?: string },
 ) {
   return await db
@@ -27,6 +26,8 @@ async function createUser(
       did,
       handle,
       didDoc: JSON.stringify(didDoc),
+      grantedScopes: scope,
+      preferences: JSON.stringify({}),
       lastIp: updates.ip,
       lastUserAgent: updates.userAgent ?? null,
     })
@@ -38,6 +39,7 @@ export async function upsertUser(
   did: string,
   handle: string,
   didDoc: any,
+  scopes: string,
   updates: { ip: string; userAgent?: string },
 ) {
   const appUser = await getUser(did);
@@ -49,6 +51,7 @@ export async function upsertUser(
       .set({
         handle,
         didDoc: JSON.stringify(didDoc),
+        grantedScopes: scopes,
         lastIp: updates.ip,
         lastUserAgent: updates.userAgent ?? null,
       })
@@ -56,5 +59,9 @@ export async function upsertUser(
       .executeTakeFirstOrThrow();
   }
 
-  return await createUser(did, handle, didDoc, updates);
+  return await createUser(did, handle, didDoc, scopes, updates);
+}
+
+export function userHasWriteAtScopes(user: User | undefined): boolean {
+  return user?.grantedScopes?.includes("transition:generic") ?? false;
 }

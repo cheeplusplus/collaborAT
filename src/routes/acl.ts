@@ -11,7 +11,7 @@ import {
   unsealAccessControl,
   updateAccessControl,
 } from "../db/repository/accessControl";
-import { getUser } from "../db/repository/user";
+import { getUser, userHasWriteAtScopes } from "../db/repository/user";
 import {
   generateRandomPassword,
   generateRandomUsername,
@@ -89,6 +89,7 @@ app.get("/", requireUser(), async (req, res) => {
   return res.render("acl/index", {
     grantedByMe: await Promise.all(grantedByMe.map(transformGrant)),
     grantedToMe: await Promise.all(grantedToMe.map(transformGrant)),
+    atReadOnly: !userHasWriteAtScopes(req.user.userRecord),
   });
 });
 

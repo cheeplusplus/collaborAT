@@ -1,7 +1,8 @@
 import express from "express";
 import { Agent } from "@atproto/api";
-import { upsertUser } from "../db/repository/user";
+import { getUser, upsertUser } from "../db/repository/user";
 import { generateRandomPassword, generateRandomValue } from "../util/security";
+import { assertUser, requireUser } from "../middleware/auth";
 
 const app = express.Router();
 
@@ -9,25 +10,65 @@ app.get("/login", (req, res) => {
   res.render("auth/login");
 });
 
+interface LoginBody {
+  handle: string;
+}
+
 // Create an endpoint to initiate the OAuth flow
 app.post("/login", express.urlencoded({ extended: true }), async (req, res) => {
   if (req.session.loggedInDid) {
     return res.redirect("/");
   }
 
-  const handle = req.body.handle;
+  // Reset the oauth state
+  const state = generateRandomValue(8);
+  req.session.oauthState = state;
+
+  const body = req.body as LoginBody;
+  const handle = body.handle;
   if (!handle) {
     return res.status(400).send("Handle is required");
   }
 
-  const state = generateRandomValue(8);
-  req.session.oauthState = state;
+  // Resolve the scope, we need to look up if the user is registered to repeat their login elevation
+  const identity = await req.atprotoClient.identityResolver.resolve(handle);
+  if (!identity.did) {
+    res.status(400).send("Invalid handle");
+  }
+  const userRecord = await getUser(identity.did);
 
   const url = await req.atprotoClient.authorize(handle, {
     state,
+    scope: userRecord?.grantedScopes ?? "atproto",
   });
   res.redirect(url.toString());
 });
+
+interface LoginReauthBody {
+  scopes: "read" | "write";
+}
+
+app.post(
+  "/login/reauth",
+  requireUser(403),
+  express.urlencoded({ extended: true }),
+  async (req, res) => {
+    assertUser(req.user);
+
+    const body = req.body as LoginReauthBody;
+    const state = generateRandomValue(8);
+    req.session.oauthState = state;
+
+    const requestedScopes =
+      body.scopes === "read" ? "atproto" : "atproto transition:generic";
+
+    const url = await req.atprotoClient.authorize(req.user.userDid, {
+      state,
+      scope: requestedScopes,
+    });
+    res.redirect(url.toString());
+  },
+);
 
 app.get("/logout", (req, res) => {
   req.session.destroy(() => {
@@ -53,6 +94,9 @@ app.get("/atproto-oauth-callback", async (req, res) => {
     return;
   }
 
+  const tokenInfo = await session.getTokenInfo();
+  const scope = tokenInfo.scope;
+
   // Make Authenticated API calls
   const { data: userRepo } = await agent.com.atproto.repo.describeRepo({
     repo: agent.did,
@@ -62,6 +106,7 @@ app.get("/atproto-oauth-callback", async (req, res) => {
     agent.did,
     userRepo.handle,
     userRepo.didDoc,
+    scope,
     { ip: req.ip!, userAgent: req.headers["user-agent"] as string },
   );
   req.session.loggedInDid = appUser.did;

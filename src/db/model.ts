@@ -28,10 +28,15 @@ export interface Database {
   atprotoSession: AtprotoSessionTable;
 }
 
+interface UserPreferences {}
+
 export interface UserTable {
   did: string;
   handle: string;
   didDoc: JSONColumnType<DidDocument>;
+
+  grantedScopes: string;
+  preferences: JSONColumnType<UserPreferences>;
 
   // security tracking data
   lastUsedAt: LastUsedAtDate;

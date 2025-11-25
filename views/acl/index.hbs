@@ -18,12 +18,16 @@
 <hr>
 <div>
     <h3>Create new ACL</h3>
-    <p>This creates a login for the actor to use. Access rights will be granted on the next page.</p>
-    <form method="post">
-        <label>
-            Actor:
-            <input type="text" name="actorDid" placeholder="Handle or DID">
-        </label><br>
-        <input type="submit">
-    </form>
+    {{#if atReadOnly}}
+        <p>You must grant the application write permissions to create an ACL.</p>
+    {{else}}
+        <p>This creates a login for the actor to use. Access rights will be granted on the next page.</p>
+        <form method="post">
+            <label>
+                Actor:
+                <input type="text" name="actorDid" placeholder="Handle or DID">
+            </label><br>
+            <input type="submit">
+        </form>
+    {{/if}}
 </div>

@@ -6,6 +6,19 @@ Hello world!
         <a href="/acl">Manage access</a>
     </p>
     <p>
+    {{#if atReadOnly}}
+        <form action="/login/reauth" method="post">
+            <input type="hidden" name="scopes" value="write">
+            <input type="submit" value="Grant write permissions">
+        </form>
+    {{else}}
+        <form action="/login/reauth" method="post">
+            <input type="hidden" name="scopes" value="read">
+            <input type="submit" value="Revoke write permissions">
+        </form>
+    {{/if}}
+    </p>
+    <p>
         <a href="/logout">Log out</a>
     </p>
 {{else}}

@@ -1,7 +1,7 @@
 {
-  "name": "sharesky",
+  "name": "collaborat",
   "version": "1.0.0",
-  "description": "",
+  "description": "Collaborative ATProto account sharing platform.",
   "main": "build/index.js",
   "scripts": {
     "start": "node build/index.js",

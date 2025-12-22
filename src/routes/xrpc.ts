@@ -180,6 +180,6 @@ app.get("/com.atproto.server.describeServer", (req, res) => {
   } satisfies ComAtprotoServerDescribeServer.OutputSchema);
 });
 
-app.all("/{*path}", express.raw({ type: "*/*" }), xrpcProxy);
+app.all("/{*path}", express.raw({ type: "*/*", limit: '1Mb' }), xrpcProxy);
 
 export default app;

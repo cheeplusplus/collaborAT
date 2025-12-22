@@ -88,6 +88,7 @@ const xrpcProxy = async (req: express.Request, res: express.Response) => {
           event.collection,
         );
         if (!inScopeEventRes.matched) {
+          console.warn("Interaction: ACL action disallowed", req.ip, xrpcName, acl.id, acl.scopes, inScopeEventRes);
           return atprotoError(
             res,
             "InvalidRequest",
@@ -105,6 +106,7 @@ const xrpcProxy = async (req: express.Request, res: express.Response) => {
       // Check all scopes if we have no event scopes (causes problems with partial scope matching)
       const inScopeRes = inScope(xrpcName, acl.scopes as AnyScope[]);
       if (!inScopeRes.matched) {
+        console.warn("Interaction: ACL action disallowed", req.ip, xrpcName, acl.id, acl.scopes, inScopeRes);
         return atprotoError(
           res,
           "InvalidRequest",

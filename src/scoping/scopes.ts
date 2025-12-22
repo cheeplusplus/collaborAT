@@ -48,7 +48,7 @@ export const EndpointCategories: {
   "com.atproto.identity.*": ["identity", "_FORBID"], // none of the POST actions here are allowed, important ones are intercepted already
   "com.atproto.moderation.createReport": ["moderation", "moderation"],
   "com.atproto.repo.*": ["repo", "repo_records"], // see RecordCollectionCategories
-  "com.atproto.repo.uploadBlobs": ["repo", "image_upload"], // special cased into its own category
+  "com.atproto.repo.uploadBlob": ["repo", "image_upload"], // special cased into its own category
   "com.atproto.server.*": ["server", "_FORBID"], // none of the POST actions here are allowed, important ones are intercepted already
   "com.atproto.sync.*": ["sync", "_FORBID"], // pretty sure this is PDS-only
   "tools.ozone.*": ["ozone", "_FORBID"], // moderation tools are not supported

@@ -90,10 +90,10 @@ const xrpcProxy = async (req: express.Request, res: express.Response) => {
         if (!inScopeEventRes.matched) {
           console.warn(
             "Interaction: ACL action disallowed",
-            req.ip,
             xrpcName,
-            acl.id,
+            `acl#${acl.id}`,
             acl.scopes,
+            `token#${token.id}`,
             inScopeEventRes,
           );
           return atprotoError(
@@ -115,10 +115,10 @@ const xrpcProxy = async (req: express.Request, res: express.Response) => {
       if (!inScopeRes.matched) {
         console.warn(
           "Interaction: ACL action disallowed",
-          req.ip,
           xrpcName,
-          acl.id,
+          `acl#${acl.id}`,
           acl.scopes,
+          `token#${token.id}`,
           inScopeRes,
         );
         return atprotoError(
@@ -195,7 +195,8 @@ const xrpcProxy = async (req: express.Request, res: express.Response) => {
 
   console.log(
     "proxy",
-    `on ACL ${acl.id}`,
+    `acl#${acl.id}`,
+    `token#${token.id}`,
     req.method,
     xrpcName,
     rewrittenUrl,

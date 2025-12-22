@@ -20,7 +20,7 @@ WORKDIR /usr/src/app
 # Install packages
 COPY package.json .
 COPY package-lock.json .
-RUN npm install --only=production
+RUN npm install --omit=dev
 
 # Copy build artifacts
 COPY --from=builder /usr/src/build/build build/

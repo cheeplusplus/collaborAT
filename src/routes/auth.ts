@@ -7,7 +7,7 @@ import { assertUser, requireUser } from "../middleware/auth";
 const app = express.Router();
 
 app.get("/login", (req, res) => {
-  res.render("auth/login");
+  res.typedRender("auth/login", {});
 });
 
 interface LoginBody {
@@ -110,6 +110,7 @@ app.get("/atproto-oauth-callback", async (req, res) => {
     { ip: req.ip!, userAgent: req.headers["user-agent"] as string },
   );
   req.session.loggedInDid = appUser.did;
+  req.session.loggedInHandle = appUser.handle;
 
   res.redirect("/");
 });

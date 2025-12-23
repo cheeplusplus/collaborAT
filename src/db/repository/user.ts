@@ -52,6 +52,7 @@ export async function upsertUser(
         handle,
         didDoc: JSON.stringify(didDoc),
         grantedScopes: scopes,
+        lastUsedAt: new Date().toISOString(),
         lastIp: updates.ip,
         lastUserAgent: updates.userAgent ?? null,
       })

@@ -1,0 +1,51 @@
+{% extends "layouts/main.html.njk" %}
+{% block content %}
+    <h1>Access Controls</h1>
+    {% if grantedByMe.length > 0 or grantedToMe.length > 0 %}
+        <div class="row">
+            <div class="col">
+                <h2>Created by you</h2>
+                {% if grantedByMe.length > 0 %}
+                    {% for item in grantedByMe %}
+                        <p><a href="/acl/{{ item.id }}">ACL {{ item.id }} granted by <strong>you</strong> to
+                                <strong>{{ item.actorHandle }}</strong></a></p>
+                    {% endfor %}
+                {% else %}
+                    You have not granted any ACLs to anyone.
+                {% endif %}
+            </div>
+            <div class="col">
+                <h2>Granted to you</h2>
+                {% if grantedToMe.length > 0 %}
+                    {% for item in grantedToMe %}
+                        <p><a href="/acl/{{ item.id }}">ACL {{ item.id }} granted by
+                                <strong>{{ item.targetHandle }}</strong> to
+                                <strong>you</strong></a></p>
+                    {% endfor %}
+                {% else %}
+                    You have no ACLs granted to you.
+                {% endif %}
+            </div>
+        </div>
+        <hr>
+    {% endif %}
+    <div>
+        <h3>Create new ACL</h3>
+        {% if atReadOnly %}
+            <p>You must grant the application write permissions to create an ACL.</p>
+        {% else %}
+            <p>This creates a login for the actor to use. Access rights will be granted on the next page.</p>
+            <form method="post">
+                <div class="mb-3 w-25">
+                    <label for="actorDid" class="form-label">Grant to</label>
+                    <div class="input-group">
+                        <span class="input-group-text">@</span>
+                        <input type="text" class="form-control" id="actorDid" name="actorDid"
+                               placeholder="Handle or DID">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Create</button>
+            </form>
+        {% endif %}
+    </div>
+{% endblock %}

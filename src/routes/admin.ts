@@ -22,17 +22,17 @@ app.get("/acls", async (req, res) => {
     })),
   );
 
-  return res.render("admin/acls", { acls: metaAcls });
+  return res.typedRender("admin/acls", { acls: metaAcls });
 });
 
 app.get("/audit-logs", async (req, res) => {
   const auditLogs = await getRecentAuditLogs();
-  return res.render("admin/audit-logs", { auditLogs });
+  return res.typedRender("admin/audit-logs", { auditLogs });
 });
 
 app.get("/users", async (req, res) => {
   const users = await getAllUsers();
-  return res.render("admin/users", { users });
+  return res.typedRender("admin/users", { users });
 });
 
 export default app;

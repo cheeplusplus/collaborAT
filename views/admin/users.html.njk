@@ -1,0 +1,24 @@
+{% extends "layouts/main.html.njk" %}
+{% block content %}
+    <h1>All users</h1>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>DID</th>
+            <th>Handle</th>
+            <th>Last logged in</th>
+            <th>Created at</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+            <tr>
+                <td><a href="https://bsky.app/profile/{{ user.did }}">{{ user.did }}</a></td>
+                <td>{{ user.handle }}</td>
+                <td>{{ user.lastUsedAt }}</td>
+                <td>{{ user.createdAt }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

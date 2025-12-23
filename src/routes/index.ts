@@ -1,5 +1,5 @@
-import { engine } from "express-handlebars";
 import express from "express";
+import nunjucks from "nunjucks";
 import authRouter from "./auth";
 import xrpcRouter from "./xrpc";
 import adminRouter from "./admin";
@@ -10,6 +10,7 @@ import { getConfig } from "../config";
 import compression from "compression";
 import { optionalUser } from "../middleware/auth";
 import { userHasWriteAtScopes } from "../db/repository/user";
+import { typedRender } from "../util/typedViews";
 
 const app = express();
 app.use(compression());
@@ -30,14 +31,27 @@ app.use(
   }),
 );
 
-const helpers = {
-  json: (context: any) => JSON.stringify(context),
-  jsonF: (context: any) => JSON.stringify(context, null, 2),
-};
+app.engine("html.njk", nunjucks.render);
+app.set("view engine", "html.njk");
+const njk = nunjucks.configure("views", {
+  autoescape: true,
+  express: app,
+  noCache: true,
+});
+njk.addFilter("json", (context) => JSON.stringify(context));
+njk.addFilter("jsonF", (context) => JSON.stringify(context, null, 2));
 
-app.engine(".hbs", engine({ extname: ".hbs", helpers }));
-app.set("view engine", "hbs");
-app.set("views", "./views");
+// View renderer helpers
+app.use((req, res, next) => {
+  njk.addGlobal("global_nav", {
+    path: req.path,
+    is_logged_in: !!req.session?.loggedInDid,
+    logged_in_did: req.session?.loggedInDid,
+    logged_in_handle: req.session?.loggedInHandle ?? req.session?.loggedInDid,
+  });
+  res.typedRender = (view, locals) => typedRender(res, view, locals);
+  next();
+});
 
 app.use(authRouter);
 app.use("/xrpc", xrpcRouter);
@@ -45,7 +59,7 @@ app.use("/admin", adminRouter);
 app.use("/acl", aclRouter);
 
 app.get("/", optionalUser, async (req, res) => {
-  res.render("index/index", {
+  res.typedRender("index/index", {
     loggedInDid: req.session.loggedInDid,
     loggedInHandle: req.user?.userRecord?.handle,
     atReadOnly: !userHasWriteAtScopes(req.user?.userRecord),

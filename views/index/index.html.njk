@@ -1,0 +1,23 @@
+{% extends "layouts/main.html.njk" %}
+{% block content %}
+    {% if loggedInDid %}
+        <p>You are logged in as: @{{ bsky_link(loggedInDid, loggedInHandle) }} (<code>{{ loggedInDid }}</code>)</p>
+        <p>
+        {% if atReadOnly %}
+            <form action="/login/reauth" method="post">
+                <input type="hidden" name="scopes" value="write">
+                <button type="submit" class="btn btn-warning">Grant write permissions</button>
+            </form>
+        {% else %}
+            <form action="/login/reauth" method="post">
+                <input type="hidden" name="scopes" value="read">
+                <button type="submit" class="btn btn-danger">Revoke write permissions</button>
+            </form>
+        {% endif %}
+        </p>
+    {% else %}
+        <p>
+            Welcome to ShareSky. Please log in to continue.
+        </p>
+    {% endif %}
+{% endblock %}

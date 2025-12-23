@@ -1,0 +1,16 @@
+{% extends "layouts/main.html.njk" %}
+{% block content %}
+    <h1>Log in to Sharesky</h1>
+
+    <form action="/login" method="POST">
+        <div class="mb-3 w-25">
+            <label for="loginDid" class="form-label">Bluesky handle:</label>
+            <div class="input-group">
+                <span class="input-group-text">@</span>
+                <input type="text" class="form-control" id="loginDid" name="handle"
+                       placeholder="Handle or DID">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Log in</button>
+    </form>
+{% endblock %}

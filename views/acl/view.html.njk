@@ -1,0 +1,96 @@
+{% extends "layouts/main.html.njk" %}
+{% block content %}
+    <h1>Viewing ACL {{ acl.id }}</h1>
+    <p>Granted to <strong>{{ bsky_link_user(actorUser) }}</strong> by <strong>{{ bsky_link_user(targetUser) }}</strong></p>
+    <a href="/acl/{{ acl.id }}/audit" class="btn btn-outline-info">View audit logs</a>
+
+    {% if mine %}
+        <form method="post" class="mt-3">
+            <h3>Scopes</h3>
+            <p>This controls the access this login will grant. Reads are allowed, and writes are forbidden unless
+                something is checked in the list below.</p>
+            <div class="ms-3">
+                <h4>Categories</h4>
+                <div class="ms-3">
+                    {% for cat in endpointCategories %}
+                        <div>
+                            <label>
+                                <input type="checkbox" name="endpointCategories[]" value="{{ cat.value }}"
+                                       {% if cat.active %}checked{% endif %}>
+                                {{ cat.label }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+                <h4 class="mt-3">Repository types</h4>
+                <p>You must check "manage repository records" above for any of these to apply.</p>
+                <div class="ms-3">
+                    {% for cat in recordCategories %}
+                        <div>
+                            <label>
+                                <input type="checkbox" name="recordCategories[]" value="{{ cat.value }}"
+                                       {% if cat.active %}checked{% endif %}>
+                                {{ cat.label }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+                <button type="submit" class="mt-3 btn btn-primary">Save</button>
+            </div>
+        </form>
+
+        <h2 class="mt-3">Revoke</h2>
+        <form method="POST" action="/acl/{{ acl.id }}/revoke">
+            <button type="submit" class="btn btn-danger">Revoke access</button>
+        </form>
+    {% else %}
+        <h2 class="mt-3">Granted scopes</h2>
+        <div class="ms-3">
+            <h3>Categories</h3>
+            <div>
+                <ul>
+                    {% for cat in endpointCategories %}
+                        {% if cat.active %}
+                            <li title="{{ cat.value }}">{{ cat.label }}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+            <h3 class="mt-2">Repository types</h3>
+            <div>
+                <ul>
+                    {% for cat in recordCategories %}
+                        {% if cat.active %}
+                            <li title="{{ cat.value }}">{{ cat.label }}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <h2>Login details</h2>
+        {% if acl.revokedAt %}
+            <strong>This ACL has been revoked.</strong>
+        {% else %}
+            {% if acl.hasPassword %}
+                <p>Username: <code>{{ acl.username }}</code></p>
+                <p>Password has already been generated.</p>
+                <h3>Password reset</h3>
+                <form method="post" action="/acl/{{ acl.id }}/reset-password">
+                    <p>Warning: This will invalidate any logged in sessions.</p>
+                    <button type="submit" class="btn btn-danger">Reset password</button>
+                </form>
+            {% else %}
+                <h3>Unseal</h3>
+                <form method="post" action="/acl/{{ acl.id }}/unseal">
+                    <button type="submit" class="btn btn-primary">Get password</button>
+                </form>
+            {% endif %}
+        {% endif %}
+
+        <h3 class="mt-3">Invalidate sessions</h3>
+        <form method="POST" action="/acl/{{ acl.id }}/invalidate-sessions">
+            <button type="submit" class="btn btn-danger">Invalidate sessions</button>
+        </form>
+    {% endif %}
+{% endblock %}

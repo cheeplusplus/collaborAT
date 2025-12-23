@@ -1,0 +1,28 @@
+{% extends "layouts/main.html.njk" %}
+{% block content %}
+    <h1>All ACLs</h1>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Target</th>
+            <th>Actor</th>
+            <th>Scopes</th>
+            <th>Has password</th>
+            <th>Has session</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in acls %}
+            <tr>
+                <td><a href="/acl/{{ item.id }}">{{ item.id }}</a></td>
+                <td><a href="https://bsky.app/profile/{{ item.targetDid }}">{{ item.targetHandle }}</a></td>
+                <td><a href="https://bsky.app/profile/{{ item.actorDid }}">{{ item.actorHandle }}</a></td>
+                <td style="max-width: 120px;"><code>{{ item.scopes }}</code></td>
+                <td>{{ item.hasPassword }}</td>
+                <td>{{ item.hasSession }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

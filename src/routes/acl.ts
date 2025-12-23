@@ -27,6 +27,7 @@ import {
 import { getAuditLogs } from "../db/repository/auditLogs";
 import { UserLookupCache } from "../util/userCache";
 import { getConfig, isAdmin } from "../config";
+import { sqliteDateToUTC } from "../util/dates";
 
 const app = express.Router();
 
@@ -38,7 +39,7 @@ const safeAcl = (
   ...acl,
   passwordHash: undefined,
   hasPassword: !!acl.passwordHash,
-  hasSession: acl.hasSession,
+  hasSession: !!acl.hasSession,
 });
 
 async function requireAcl(
@@ -86,7 +87,7 @@ app.get("/", requireUser(), async (req, res) => {
     };
   };
 
-  return res.render("acl/index", {
+  return res.typedRender("acl/index", {
     grantedByMe: await Promise.all(grantedByMe.map(transformGrant)),
     grantedToMe: await Promise.all(grantedToMe.map(transformGrant)),
     atReadOnly: !userHasWriteAtScopes(req.user.userRecord),
@@ -165,7 +166,7 @@ app.get("/:aclId", requireUser(), async (req, res) => {
     }))
     .value();
 
-  return res.render("acl/view", {
+  return res.typedRender("acl/view", {
     acl: safeAcl(acl),
     mine: acl.targetDid === req.user.userDid,
     targetUser,
@@ -220,10 +221,14 @@ app.get("/:aclId/audit", requireUser(), async (req, res) => {
   }
 
   const auditLogs = await getAuditLogs(acl.id, 50, true);
-  return res.render("acl/audit", {
+  const auditLogsFixedDates = auditLogs.map((m) => ({
+    ...m,
+    createdAt: sqliteDateToUTC(m.createdAt),
+  }));
+  return res.typedRender("acl/audit", {
     acl: safeAcl(acl),
     mine: acl.targetDid === req.user.userDid,
-    auditLogs,
+    auditLogs: auditLogsFixedDates,
   });
 });
 
@@ -252,7 +257,7 @@ app.post("/:aclId/unseal", requireUser(), async (req, res) => {
   const hashedPassword = await hashPassword(password);
   await unsealAccessControl(acl.id, hashedPassword);
 
-  return res.render("acl/unseal", {
+  return res.typedRender("acl/unseal", {
     targetDid: acl.targetDid,
     username: acl.username,
     password,

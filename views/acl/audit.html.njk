@@ -1,0 +1,40 @@
+{% extends "layouts/main.html.njk" %}
+{% block content %}
+    <h1>Audit logs for ACL {{ acl.id }}</h1>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">When</th>
+            <th scope="col">Endpoint</th>
+            <th scope="col">Scope</th>
+            <th scope="col">Record</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for entry in auditLogs %}
+            <tr>
+                <td class="date-transmog" data-isodate="{{ entry.createdAt }}">{{ entry.createdAt }}</td>
+                <td>{{ entry.xrpcCall }}</td>
+                <td>{{ entry.matchedScope }}</td>
+                <td>
+                    {% for recordEntry in entry.records %}
+                        <pre>{{ recordEntry.record | jsonF }}</pre>
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+{% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@3.6.0/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@3.6.0/locale/en/cdn.min.js"></script>
+    <script>
+        document.querySelectorAll(".date-transmog").forEach(el => {
+            const dateData = el.dataset.isodate;
+            if (!dateData) return;
+            el.textContent = dateFns.formatDistance(dateData, new Date(), {addSuffix: true});
+            el.setAttribute('title', dateFns.format(dateData, 'yyyy-MM-dd HH:mm:ss'));
+        })
+    </script>
+{% endblock %}

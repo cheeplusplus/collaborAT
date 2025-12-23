@@ -9,4 +9,8 @@ declare namespace Express {
 
     user?: RequestUserData;
   }
+
+  export interface Response {
+    typedRender: import("./util/typedViews").TypedRenderFn;
+  }
 }

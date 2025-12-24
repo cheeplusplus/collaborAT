@@ -1,15 +1,10 @@
+{% import "includes/bsky.njk" as bsky %}
 {% macro is_active_page(path) -%}
     {%- if global_nav.path == path %}active{% endif -%}
 {%- endmacro -%}
 {% macro is_active_tree(path) -%}
     {%- if global_nav.path.startsWith(path) %}active{% endif -%}
 {%- endmacro -%}
-{% macro bsky_link(did, handle='', classes='') -%}
-    <a href="https://bsky.app/profile/{{ did }}" class="{{ classes }}">{{ handle | d(did) }}</a>
-{%- endmacro %}
-{% macro bsky_link_user(user, classes='') -%}
-    {{ bsky_link(user.did, user.handle, classes) }}
-{%- endmacro %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -46,7 +41,7 @@
                             {{ global_nav.logged_in_handle }}
                         </a>
                         <ul class="dropdown-menu">
-                            <li>{{ bsky_link(global_nav.logged_in_did, "Go to Bluesky", "dropdown-item") }}</li>
+                            <li>{{ bsky.link(global_nav.logged_in_did, "Go to Bluesky", "dropdown-item") }}</li>
                             <li><a class="dropdown-item" href="/logout">Log out</a></li>
                         </ul>
                     </li>

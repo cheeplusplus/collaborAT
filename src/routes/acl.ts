@@ -49,7 +49,7 @@ async function requireAcl(
 ) {
   assertUser(req.user);
   const aclId = req.params.aclId;
-  if (!aclId) {
+  if (!aclId || typeof aclId !== "string") {
     res.status(400).json({ error: "Missing ACL ID" });
     return undefined;
   }

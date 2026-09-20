@@ -4,8 +4,8 @@
 {% macro link_user(user, classes='') -%}
     {{ link(user.did, user.handle, classes) }}
 {%- endmacro %}
-{% macro blob_img(repo, blob_id, category='', classes='') -%}
-    <img src="https://cdn.bsky.app/img/{{ category | d('feed_thumbnail') }}/plain/{{ repo }}/{{ blob_id }}@jpeg"
+{% macro blob_img(repo, blob_id, category='feed_thumbnail', classes='') -%}
+    <img src="https://cdn.bsky.app/img/{{ category }}/plain/{{ repo }}/{{ blob_id }}@jpeg"
          class="{{ classes }}"
          alt="Image">
 {%- endmacro %}

@@ -1,5 +1,6 @@
+{% import "includes/bsky.njk" as bsky %}
 {% macro format_blob(repo, body) %}
-    <p>Uploaded blob: <img src="{{ bsky_blob_img(repo, body.blob) }}"/></p>
+    <p>Uploaded blob: {{ bsky.blob_img(repo, body.blob.ref.$link, "feed_thumbnail", "img-fluid") }}</p>
 {% endmacro %}
 {% macro format_bookmark(body, created) %}
     {% set parsed_subject = (body.uri | parseAtUri) %}

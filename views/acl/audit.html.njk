@@ -22,6 +22,8 @@
                 <td>
                     {% if entry.body %}
                         {{ format_nonrecords.format_call(entry.xrpcCall, acl.targetDid, entry.body) }}
+                    {% elif entry.responseBody %}
+                        {{ format_nonrecords.format_call(entry.xrpcCall, acl.targetDid, entry.responseBody) }}
                     {% endif %}
                     {% for recordEntry in entry.records %}
                         {{ format_records.format_record(recordEntry.action, recordEntry.record) }}
@@ -30,6 +32,9 @@
                 <td>
                     {% if entry.body %}
                         <span title="{{ entry.body | json }}">🍣</span>
+                    {% endif %}
+                    {% if entry.responseBody %}
+                        <span title="{{ entry.responseBody | json }}">✈️</span>
                     {% endif %}
                     {% for recordEntry in entry.records %}
                         <span title="{{ recordEntry.record | json }}">🍣</span>

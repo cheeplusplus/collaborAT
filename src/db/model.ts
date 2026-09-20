@@ -93,6 +93,7 @@ export interface ProxyAuditLogTable {
   method: string;
   qp: string | null;
   body: string | null;
+  responseBody: string | null;
 
   createdAt: CreatedAtDate;
 }

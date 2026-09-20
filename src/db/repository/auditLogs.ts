@@ -68,6 +68,7 @@ export async function createAuditLogEvent(
     method: string;
     qp: string;
     body: string | undefined;
+    responseBody: string | null;
   },
   records: RecordDetails[] | undefined,
   actor: { did: string; ip: string; userAgent?: string },
@@ -86,6 +87,7 @@ export async function createAuditLogEvent(
         method: event.method,
         qp: event.qp,
         body: event.body,
+        responseBody: event.responseBody,
       })
       .returning("id")
       .executeTakeFirstOrThrow();

@@ -219,9 +219,11 @@ const xrpcProxy = async (req: express.Request, res: express.Response) => {
       xrpcName.toLowerCase(),
     )
   ) {
-    // Log the POST body if it isn't something we track elsewhere (aka a record write)
+    // Log the POST bodies if it isn't something we track elsewhere (aka a repo record)
     const body =
       reqJsonBody && !requestEvent ? JSON.stringify(reqJsonBody) : undefined;
+    const responseBody =
+      proxyRes && !responseEvent ? JSON.stringify(proxyRes) : null;
 
     // Only log "writes", GETs are too noisy
     await createAuditLogEvent(
@@ -233,6 +235,7 @@ const xrpcProxy = async (req: express.Request, res: express.Response) => {
         method: req.method as string,
         qp: JSON.stringify(req.query),
         body,
+        responseBody,
       },
       eventDetails,
       {

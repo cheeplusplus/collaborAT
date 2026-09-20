@@ -2,7 +2,7 @@
 {% import "includes/bsky.njk" as bsky %}
 {% block content %}
     <h1>Viewing ACL {{ acl.id }}</h1>
-    <p>Granted to <strong>{{ bsky.link_user(actorUser) }}</strong> by <strong>{{ bsky_link_user(targetUser) }}</strong>
+    <p>Granted to <strong>{{ bsky.link_user(actorUser) }}</strong> by <strong>{{ bsky.link_user(targetUser) }}</strong>
     </p>
     <a href="/acl/{{ acl.id }}/audit" class="btn btn-outline-info">View audit logs</a>
 

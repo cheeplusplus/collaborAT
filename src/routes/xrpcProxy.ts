@@ -35,6 +35,7 @@ const IGNORE_OUTBOUND_HEADERS: Lowercase<string>[] = [
 const IGNORE_INBOUND_HEADERS: Lowercase<string>[] = [
   "content-encoding",
   "content-length",
+  "transfer-encoding",
   "x-content-encoding-over-network",
 ];
 

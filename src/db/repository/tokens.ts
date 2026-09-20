@@ -71,3 +71,12 @@ export async function revokeAccessTokensByAclId(id: number) {
     })
     .execute();
 }
+
+export async function getFirstTokenLoginDateByAclId(id: number) {
+  const value = await db
+    .selectFrom("proxyTokens")
+    .where("aclId", "=", id)
+    .select((eb) => eb.fn.min<string | null>("firstUsedAt").as("firstLoginDate"))
+    .executeTakeFirst();
+  return value?.firstLoginDate ?? undefined;
+}

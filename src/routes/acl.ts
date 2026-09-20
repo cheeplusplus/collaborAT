@@ -18,7 +18,10 @@ import {
   hashPassword,
 } from "../util/security";
 import { AccessControl } from "../db/model";
-import { revokeAccessTokensByAclId } from "../db/repository/tokens";
+import {
+  getFirstTokenLoginDateByAclId,
+  revokeAccessTokensByAclId,
+} from "../db/repository/tokens";
 import {
   EndpointCategoryDescriptions,
   isValidScope,
@@ -166,6 +169,8 @@ app.get("/:aclId", requireUser(), async (req, res) => {
     }))
     .value();
 
+  const firstLoginDate = await getFirstTokenLoginDateByAclId(acl.id);
+
   return res.typedRender("acl/view", {
     acl: safeAcl(acl),
     mine: acl.targetDid === req.user.userDid,
@@ -173,6 +178,7 @@ app.get("/:aclId", requireUser(), async (req, res) => {
     actorUser,
     endpointCategories,
     recordCategories,
+    firstLoginDate: firstLoginDate ?? undefined,
   });
 });
 

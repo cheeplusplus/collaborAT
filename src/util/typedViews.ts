@@ -36,6 +36,7 @@ interface ViewLocals {
     mine: boolean;
     endpointCategories: Options[];
     recordCategories: Options[];
+    firstLoginDate?: string;
   };
   "admin/acls": { acls: unknown[] };
   "admin/audit-logs": { auditLogs: unknown[] };

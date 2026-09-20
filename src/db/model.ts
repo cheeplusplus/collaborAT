@@ -92,6 +92,7 @@ export interface ProxyAuditLogTable {
   matchedScope: string;
   method: string;
   qp: string | null;
+  body: string | null;
 
   createdAt: CreatedAtDate;
 }

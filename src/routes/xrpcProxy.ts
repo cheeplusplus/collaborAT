@@ -60,10 +60,11 @@ const xrpcProxy = async (req: express.Request, res: express.Response) => {
   }
   const { acl, token } = aclData;
 
+  let reqJsonBody: any | undefined;
   let requestEvent: RecordRequestDetails[] | undefined;
   if (req.headers["content-type"]?.startsWith("application/json")) {
     try {
-      const reqJsonBody = JSON.parse(req.body.toString("utf-8"));
+      reqJsonBody = JSON.parse(req.body.toString("utf-8"));
       requestEvent = extractRecordDetailsFromRequest(xrpcName, reqJsonBody);
     } catch (e) {
       // Don't die, we still audit log
@@ -215,6 +216,10 @@ const xrpcProxy = async (req: express.Request, res: express.Response) => {
       xrpcName.toLowerCase(),
     )
   ) {
+    // Log the POST body if it isn't something we track elsewhere (aka a record write)
+    const body =
+      reqJsonBody && !requestEvent ? JSON.stringify(reqJsonBody) : undefined;
+
     // Only log "writes", GETs are too noisy
     await createAuditLogEvent(
       acl.id,
@@ -224,6 +229,7 @@ const xrpcProxy = async (req: express.Request, res: express.Response) => {
         matchedScope: _.chain(matchedScopes).uniq().join(" ").value(),
         method: req.method as string,
         qp: JSON.stringify(req.query),
+        body,
       },
       eventDetails,
       {

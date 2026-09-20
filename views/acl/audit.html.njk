@@ -17,6 +17,9 @@
                 <td>{{ entry.xrpcCall }}</td>
                 <td>{{ entry.matchedScope }}</td>
                 <td>
+                    {% if entry.body %}
+                        <pre>{{ entry.body | jsonF }}</pre>
+                    {% endif %}
                     {% for recordEntry in entry.records %}
                         <pre>{{ recordEntry.record | jsonF }}</pre>
                     {% endfor %}

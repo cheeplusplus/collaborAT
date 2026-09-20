@@ -67,6 +67,7 @@ export async function createAuditLogEvent(
     matchedScope: string;
     method: string;
     qp: string;
+    body: string | undefined;
   },
   records: RecordDetails[] | undefined,
   actor: { did: string; ip: string; userAgent?: string },
@@ -84,6 +85,7 @@ export async function createAuditLogEvent(
         matchedScope: event.matchedScope,
         method: event.method,
         qp: event.qp,
+        body: event.body,
       })
       .returning("id")
       .executeTakeFirstOrThrow();

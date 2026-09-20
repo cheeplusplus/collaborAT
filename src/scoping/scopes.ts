@@ -4,6 +4,7 @@ type XrpcGroup =
   | "actor"
   | "feed"
   | "graph"
+  | "bookmark"
   | "notifications"
   | "video"
   | "chat"
@@ -24,6 +25,7 @@ export type EndpointCategory =
   | "push"
   | "seen"
   | "video_upload"
+  | "bookmark"
   | "repo_records"
   | "_FORBID";
 
@@ -39,6 +41,8 @@ export const EndpointCategories: {
   "app.bsky.graph.unmuteActorList": ["graph", "graph_mute"],
   "app.bsky.graph.unmuteActor": ["graph", "graph_mute"],
   "app.bsky.graph.unmuteThread": ["graph", "graph_mute"],
+  "app.bsky.bookmark.createBookmark": ["bookmark", "bookmark"],
+  "app.bsky.bookmark.deleteBookmark": ["bookmark", "bookmark"],
   "app.bsky.notification.putPreferences": ["notifications", "client_prefs"],
   "app.bsky.notification.registerPush": ["notifications", "push"],
   "app.bsky.notification.updateSeen": ["notifications", "seen"],
@@ -64,6 +68,7 @@ export const EndpointCategoryDescriptions: { [T in EndpointCategory]: string } =
     video_upload: "Upload video",
     image_upload: "Upload images",
     moderation: "Send moderation reports",
+    bookmark: "Bookmark posts",
     repo_records: "Manage repository records (posts, likes, follows, etc.)",
     _FORBID: "[Not allowed]",
   };

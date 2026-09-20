@@ -11,6 +11,7 @@ import compression from "compression";
 import { optionalUser } from "../middleware/auth";
 import { userHasWriteAtScopes } from "../db/repository/user";
 import { typedRender } from "../util/typedViews";
+import { parseAtUri } from "../util/atprotoTools";
 
 const app = express();
 app.use(compression());
@@ -40,6 +41,7 @@ const njk = nunjucks.configure("views", {
 });
 njk.addFilter("json", (context) => JSON.stringify(context));
 njk.addFilter("jsonF", (context) => JSON.stringify(context, null, 2));
+njk.addFilter("parseAtUri", (context) => parseAtUri(context));
 
 // View renderer helpers
 app.use((req, res, next) => {

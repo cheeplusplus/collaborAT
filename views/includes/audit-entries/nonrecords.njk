@@ -1,0 +1,19 @@
+{% macro format_blob(repo, body) %}
+    <p>Uploaded blob: <img src="{{ bsky_blob_img(repo, body.blob) }}"/></p>
+{% endmacro %}
+{% macro format_bookmark(body, created) %}
+    {% set parsed_subject = (body.uri | parseAtUri) %}
+    <p>{% if created %}Bookmarked{% else %}Removed bookmark for{% endif %} <a
+                href="https://bsky.app/profile/{{ parsed_subject.did }}/post/{{ parsed_subject.rkey }}">a post</a></p>
+{% endmacro %}
+{% macro format_call(xrpcCall, repo, body) %}
+    {% if xrpcCall == "com.atproto.repo.uploadBlob" %}
+        {{ format_blob(repo, body) }}
+        {% elif xrpcCall == "app.bsky.bookmark.createBookmark" %}
+        {{ format_bookmark(body, true) }}
+        {% elif xrpcCall == "app.bsky.bookmark.deleteBookmark" %}
+        {{ format_bookmark(body, false) }}
+    {% else %}
+        <pre>{{ entry.body | jsonF }}</pre>
+    {% endif %}
+{% endmacro %}

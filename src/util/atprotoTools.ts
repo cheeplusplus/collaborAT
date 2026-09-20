@@ -3,6 +3,7 @@ import {
   ComAtprotoRepoCreateRecord,
   ComAtprotoRepoDeleteRecord,
   ComAtprotoRepoPutRecord,
+  AtUri,
 } from "@atproto/api";
 import { RepoOperationSource } from "../scoping/scopes";
 
@@ -19,8 +20,7 @@ export interface RecordResponseDetails {
   cid?: string;
 }
 export interface RecordDetails
-  extends RecordRequestDetails,
-    RecordResponseDetails {}
+  extends RecordRequestDetails, RecordResponseDetails {}
 
 export function extractRecordDetailsFromRequest(
   xrpcName: string,
@@ -139,4 +139,19 @@ export function extractRecordDetailsFromResponse(
   }
 
   return undefined;
+}
+
+export function parseAtUri(uri: string): {
+  uri: string;
+  did: string;
+  collection: string;
+  rkey: string;
+} {
+  const parsed = new AtUri(uri);
+  return {
+    uri,
+    did: parsed.hostname,
+    collection: parsed.collection,
+    rkey: parsed.rkey,
+  };
 }

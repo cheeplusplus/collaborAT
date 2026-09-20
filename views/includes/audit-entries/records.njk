@@ -1,0 +1,60 @@
+{% import "includes/bsky.njk" as bsky %}
+{% macro friendly_collection_name(collection) %}
+    {%- if collection == "app.bsky.feed.post" -%}post{%- elif collection == "app.bsky.feed.like" -%}like{%- elif collection == "app.bsky.feed.repost" -%}repost{%- else -%}{{ collection }}{% endif -%}
+{% endmacro %}
+{% macro format_post(record) %}
+    <div>
+        Posted:
+        <blockquote>{{ record.record.text }}</blockquote>
+        (<a href="https://bsky.app/profile/{{ record.repo }}/post/{{ record.rkey }}">Link</a>)
+    </div>
+{% endmacro %}
+{% macro format_repost(record) %}
+    {% set parsed_subject = (record.record.subject.uri | parseAtUri) %}
+    <p>Reposted <a href="https://bsky.app/profile/{{ parsed_subject.did }}/post/{{ parsed_subject.rkey }}">a post</a>
+    </p>
+{% endmacro %}
+{% macro format_like(record) %}
+    {% set parsed_subject = (record.record.subject.uri | parseAtUri) %}
+    <p>Liked <a href="https://bsky.app/profile/{{ parsed_subject.did }}/post/{{ parsed_subject.rkey }}">a post</a></p>
+{% endmacro %}
+{% macro format_profile(record) %}
+    <div>Updated profile:
+        <div><strong>Name</strong>: <span>{{ record.record.displayName }}</span></div>
+        <div><strong>Description</strong>: <span>{{ record.record.description }}</span></div>
+        {% if record.record.avatar.ref.$link %}
+            <div><strong>Avatar</strong>:
+                <span>{{ bsky.blob_img(record.repo, record.record.avatar.ref.$link, "avatar_thumbnail") }}</span></div>
+        {% endif %}
+        {% if record.record.banner.ref.$link %}
+            <div><strong>Banner</strong>:
+                <span>{{ bsky.blob_img(record.repo, record.record.banner.ref.$link, "banner", "img-fluid") }}</span>
+            </div>
+        {% endif %}
+    </div>
+{% endmacro %}
+{% macro format_record(action, record) %}
+    {% if action == "create" %}
+        {% if record.collection == "app.bsky.feed.post" %}
+            {{ format_post(record) }}
+            {% elif record.collection == "app.bsky.feed.like" %}
+            {{ format_like(record) }}
+            {% elif record.collection == "app.bsky.feed.repost" %}
+            {{ format_repost(record) }}
+            {% elif record.collection == "app.bsky.actor.profile" %}
+            {{ format_profile(record) }}
+        {% else %}
+            <pre>{{ record | jsonF }}</pre>
+        {% endif %}
+        {% elif action == "update" %}
+        {% if record.collection == "app.bsky.actor.profile" %}
+            {{ format_profile(record) }}
+        {% else %}
+            <pre>{{ record | jsonF }}</pre>
+        {% endif %}
+        {% elif action == "delete" %}
+        <p>Deleted {{ friendly_collection_name(record.collection) }} <code>{{ record.rkey }}</code></p>
+    {% else %}
+        <pre>{{ record | jsonF }}</pre>
+    {% endif %}
+{% endmacro %}

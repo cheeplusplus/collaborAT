@@ -1,0 +1,11 @@
+{% macro link(did, handle='', classes='') -%}
+    <a href="https://bsky.app/profile/{{ did }}" class="{{ classes }}">{{ handle | d(did) }}</a>
+{%- endmacro %}
+{% macro link_user(user, classes='') -%}
+    {{ link(user.did, user.handle, classes) }}
+{%- endmacro %}
+{% macro blob_img(repo, blob_id, category='', classes='') -%}
+    <img src="https://cdn.bsky.app/img/{{ category | d('feed_thumbnail') }}/plain/{{ repo }}/{{ blob_id }}@jpeg"
+         class="{{ classes }}"
+         alt="Image">
+{%- endmacro %}

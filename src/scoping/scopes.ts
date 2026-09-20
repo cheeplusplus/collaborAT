@@ -2,6 +2,7 @@ import _ from "lodash";
 
 type XrpcGroup =
   | "actor"
+  | "ageassurance"
   | "feed"
   | "graph"
   | "bookmark"
@@ -34,6 +35,7 @@ export const EndpointCategories: {
   [key: string]: [XrpcGroup, EndpointCategory];
 } = {
   "app.bsky.actor.putPreferences": ["actor", "client_prefs"],
+  "app.bsky.ageassurance": ["ageassurance", "_FORBID"], // Age assurance APIs are not supported
   "app.bsky.feed.sendInteractions": ["feed", "feed_interactivity"],
   "app.bsky.graph.muteActorList": ["graph", "graph_mute"],
   "app.bsky.graph.muteActor": ["graph", "graph_mute"],

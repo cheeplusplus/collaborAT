@@ -15,6 +15,8 @@ import { AnyScope } from "../scoping/scopes";
 
 // Don't allow calling these with any method
 const FORBIDDEN_XRPC_PREFIXES = [
+  "app.bsky.ageassurance.",
+  "chat.bsky.",
   "com.atproto.admin.",
   "com.atproto.server.",
   "com.atproto.sync.",

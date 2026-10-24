@@ -1,13 +1,8 @@
 import * as fs from "fs";
 import { promises as fsp } from "fs";
 import * as path from "path";
-import {
-  FileMigrationProvider,
-  Kysely,
-  Migrator,
-  ParseJSONResultsPlugin,
-  SqliteDialect,
-} from "kysely";
+import { Kysely, ParseJSONResultsPlugin, SqliteDialect } from "kysely";
+import { FileMigrationProvider, Migrator } from "kysely/migration";
 import SQLite from "better-sqlite3";
 import { Database } from "./model";
 
@@ -30,6 +25,8 @@ export async function migrateToLatest() {
     provider: new FileMigrationProvider({
       fs: fsp,
       path,
+      // Hack to make it work on Windows
+      import: (filePath) => import(filePath),
       // This needs to be an absolute path.
       migrationFolder: path.join(__dirname, "migrations"),
     }),

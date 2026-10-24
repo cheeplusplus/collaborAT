@@ -1,5 +1,5 @@
 ## Build ##
-FROM node:22 AS builder
+FROM node:lts-krypton AS builder
 
 WORKDIR /usr/src/build
 
@@ -13,7 +13,7 @@ COPY . .
 RUN npm run build
 
 ## Runtime ##
-FROM node:22 AS runtime
+FROM node:lts-krypton AS runtime
 
 WORKDIR /usr/src/app
 
